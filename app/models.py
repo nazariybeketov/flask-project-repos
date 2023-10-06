@@ -7,3 +7,10 @@ class User:
         self.total_reactions = total_reactions
         self.posts = posts
 
+
+class Post:
+    def __init__(self, id: int, author_id: int, text: str, reactions=[]):
+        self.id = id
+        self.author_id = author_id
+        self.text = text
+        self.reactions = reactions

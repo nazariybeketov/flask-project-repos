@@ -1,8 +1,9 @@
-from app import app, USERS, models
+from app import app, USERS, POSTS, models
 from flask import request, Response
 import json
 from http import HTTPStatus
 import re
+
 
 @app.route("/")
 def index():
@@ -18,7 +19,6 @@ def user_create():
     email = data["email"]
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
         return Response(status=HTTPStatus.BAD_REQUEST)
-
 
     user = models.User(users_id, first_name, last_name, email)
     USERS.append(user)
@@ -57,4 +57,47 @@ def get_user(user_id):
     )
     return response
 
+@app.post("/posts/create")
+def add_post():
+    posts_id = len(POSTS)
+    data = request.get_json()
+    author_id = data["author_id"]
+    text = data["text"]
 
+    post = models.Post(
+        posts_id,
+        author_id,
+        text,
+    )
+    POSTS.append(post)
+
+    response = Response(
+        json.dumps({
+            "id": post.id,
+            "author_id": post.author_id,
+            "text": post.text,
+            "reactions": post.reactions,
+        }),
+        HTTPStatus.CREATED,
+        mimetype="application/json",
+    )
+    return response
+
+
+@app.get("/posts/<int:post_id>")
+def get_info_post(post_id):
+    post = POSTS[post_id]
+    if not(isinstance(post_id,int)) or post_id < 0 or post_id >= len(POSTS):
+        return Response(status=HTTPStatus.BAD_REQUEST)
+
+    response = Response(
+        json.dumps({
+            "id": post.id,
+            "author_id": post.author_id,
+            "text": post.text,
+            "reactions": post.reactions,
+        }),
+        HTTPStatus.CREATED,
+        mimetype="application/json",
+    )
+    return response
