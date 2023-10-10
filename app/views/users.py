@@ -5,7 +5,6 @@ from http import HTTPStatus
 import re
 
 
-
 @app.post("/users/create")
 def user_create():
     users_id = len(USERS)
@@ -34,7 +33,7 @@ def user_create():
 
 
 @app.get("/users/<int:user_id>")
-def get_user(user_id):
+def get_users_info(user_id):
     if not (isinstance(user_id, int)) or user_id < 0 or user_id >= len(USERS):
         return Response(status=HTTPStatus.NOT_FOUND)
 
@@ -52,7 +51,6 @@ def get_user(user_id):
         mimetype="application/json",
     )
     return response
-
 
 
 @app.get("/users/leaderboard")
@@ -75,17 +73,17 @@ def get_sorted_users():
     else:
         return Response(status=HTTPStatus.BAD_REQUEST)
 
-    u = []
+    temp_usrs_list = []
     for i in range(len(sorted_list)):
-        q = dict()
-        q["id"] = sorted_list[i].id
-        q["first_name"] = sorted_list[i].first_name
-        q["last_name"] = sorted_list[i].last_name
-        q["email"] = sorted_list[i].email
-        q["total_reactions"] = sorted_list[i].total_reactions
-        u.append(q)
+        temp_usrs_dct = dict()
+        temp_usrs_dct["id"] = sorted_list[i].id
+        temp_usrs_dct["first_name"] = sorted_list[i].first_name
+        temp_usrs_dct["last_name"] = sorted_list[i].last_name
+        temp_usrs_dct["email"] = sorted_list[i].email
+        temp_usrs_dct["total_reactions"] = sorted_list[i].total_reactions
+        temp_usrs_list.append(temp_usrs_dct)
     new_dict = dict()
-    new_dict["users"] = u
+    new_dict["users"] = temp_usrs_list
 
     response = Response(
         json.dumps(new_dict),

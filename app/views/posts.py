@@ -4,9 +4,8 @@ import json
 from http import HTTPStatus
 
 
-
 @app.post("/posts/create")
-def add_post():
+def add_new_post():
     data = request.get_json()
     posts_id = len(POSTS)
     author_id = data["author_id"]
@@ -30,7 +29,7 @@ def add_post():
 
 
 @app.get("/posts/<int:post_id>")
-def get_info_post(post_id):
+def get_post_info(post_id):
     post = POSTS[post_id]
     if not (isinstance(post_id, int)) or post_id < 0 or post_id >= len(POSTS):
         return Response(status=HTTPStatus.BAD_REQUEST)
@@ -49,37 +48,37 @@ def get_info_post(post_id):
 
 
 @app.get("/users/<int:user_id>/posts")
-def get_all_posts(user_id):
+def get_sorted_posts_of_our_user(user_id):
     sort_type = request.get_json()["sort"]
     all_posts = USERS[user_id].posts  # список id-шников постов нашего пользователя
-    s = []  # список постов (объектов)
+    lst_pst_obj = []  # список постов (объектов)
     for number in all_posts:
-        s.append(POSTS[number])
+        lst_pst_obj.append(POSTS[number])
 
     if sort_type == "asc":
-        for i in range(len(s) - 1):
-            for j in range(len(s) - i - 1):
-                if len(s[j].reactions) > len(s[j + 1].reactions):
-                    s[j], s[j + 1] = s[j + 1], s[j]
+        for i in range(len(lst_pst_obj) - 1):
+            for j in range(len(lst_pst_obj) - i - 1):
+                if len(lst_pst_obj[j].reactions) > len(lst_pst_obj[j + 1].reactions):
+                    lst_pst_obj[j], lst_pst_obj[j + 1] = lst_pst_obj[j + 1], lst_pst_obj[j]
 
     elif sort_type == "desc":
-        for i in range(len(s) - 1):
-            for j in range(len(s) - i - 1):
-                if len(s[j].reactions) < len(s[j + 1].reactions):
-                    s[j], s[j + 1] = s[j + 1], s[j]
+        for i in range(len(lst_pst_obj) - 1):
+            for j in range(len(lst_pst_obj) - i - 1):
+                if len(lst_pst_obj[j].reactions) < len(lst_pst_obj[j + 1].reactions):
+                    lst_pst_obj[j], lst_pst_obj[j + 1] = lst_pst_obj[j + 1], lst_pst_obj[j]
 
     else:
         return Response(status=HTTPStatus.BAD_REQUEST)
-    u = []
-    for i in range(len(s)):
-        q = dict()
-        q["id"] = s[i].id
-        q["author_id"] = s[i].author_id
-        q["text"] = s[i].text
-        q["reactions"] = s[i].reactions
-        u.append(q)
+    temp_lst_pst = []
+    for i in range(len(lst_pst_obj)):
+        temp_dct_pst = dict()
+        temp_dct_pst["id"] = lst_pst_obj[i].id
+        temp_dct_pst["author_id"] = lst_pst_obj[i].author_id
+        temp_dct_pst["text"] = lst_pst_obj[i].text
+        temp_dct_pst["reactions"] = lst_pst_obj[i].reactions
+        temp_lst_pst.append(temp_dct_pst)
     new_dict = dict()
-    new_dict["posts"] = u
+    new_dict["posts"] = temp_lst_pst
 
     response = Response(
         json.dumps(new_dict),

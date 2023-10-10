@@ -2,8 +2,9 @@ from app import app, USERS, POSTS
 from flask import request, Response
 from http import HTTPStatus
 
+
 @app.post("/posts/<int:post_id>/reaction")
-def set_reaction(post_id):
+def add_reaction_on_the_post(post_id):
     data = request.get_json()
     reaction = data["reaction"]
 

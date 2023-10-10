@@ -17,5 +17,3 @@ class Post:
         self.author_id = author_id
         self.text = text
         self.reactions = []
-
-
