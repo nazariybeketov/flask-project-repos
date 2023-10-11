@@ -9,6 +9,8 @@ def add_new_post():
     data = request.get_json()
     posts_id = len(POSTS)
     author_id = data["author_id"]
+    if not (isinstance(author_id, int)) or author_id < 0 or author_id >= len(USERS):
+        return Response(status=HTTPStatus.BAD_REQUEST)
     text = data["text"]
     user = USERS[author_id]
     post = models.Post(posts_id, author_id, text)
@@ -50,6 +52,8 @@ def get_post_info(post_id):
 @app.get("/users/<int:user_id>/posts")
 def get_sorted_posts_of_our_user(user_id):
     sort_type = request.get_json()["sort"]
+    if not(isinstance(user_id,int)) or user_id >= len(USERS) or user_id < 0:
+        return Response(status=HTTPStatus.BAD_REQUEST)
     all_posts = USERS[user_id].posts  # список id-шников постов нашего пользователя
     lst_pst_obj = []  # список постов (объектов)
     for number in all_posts:

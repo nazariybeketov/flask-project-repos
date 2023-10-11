@@ -1,8 +1,12 @@
 from app import app, USERS, models
-from flask import request, Response
+from flask import request, Response, url_for
 import json
 from http import HTTPStatus
 import re
+import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('agg')
 
 
 @app.post("/users/create")
@@ -12,8 +16,8 @@ def user_create():
     first_name = data["first_name"]
     last_name = data["last_name"]
     email = data["email"]
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-        return Response(status=HTTPStatus.BAD_REQUEST)
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email) or (email in [user.email for user in USERS]):
+        return Response("Ошибка при вводе почты", status=HTTPStatus.BAD_REQUEST)
 
     user = models.User(users_id, first_name, last_name, email)
     USERS.append(user)
@@ -56,16 +60,38 @@ def get_users_info(user_id):
 @app.get("/users/leaderboard")
 def get_sorted_users():
     data = request.get_json()
-    sort_type = data["sort"]
     sorted_list = USERS
-
-    if sort_type == "asc":
+    type_1 = data["type"]
+    if type_1 == "graph":
         for i in range(len(sorted_list) - 1):
             for j in range(len(sorted_list) - i - 1):
                 if sorted_list[j].total_reactions > sorted_list[j + 1].total_reactions:
                     sorted_list[j], sorted_list[j + 1] = sorted_list[j + 1], sorted_list[j]
 
-    elif sort_type == "desc":
+        fig, ax = plt.subplots()
+        user_names = [f'{user.first_name} {user.last_name}' for user in sorted_list]
+        user_reactions = [f'{user.total_reactions} {user.total_reactions}' for user in sorted_list]
+        ax.bar(user_names, user_reactions)
+        ax.set_ylabel("User reaction")
+        ax.set_title("User leaderboard by reactions")
+        plt.savefig("app/static/users_leaderboard.png")
+
+        return Response(
+            f"""<img src= "{url_for('static', filename='users_leaderboard.png')}">""",
+            status=HTTPStatus.OK,
+            mimetype="text/html",
+        )
+
+    sort_type = data["sort"]
+
+    if sort_type == "asc" and type_1 == "list":
+        for i in range(len(sorted_list) - 1):
+            for j in range(len(sorted_list) - i - 1):
+                if sorted_list[j].total_reactions > sorted_list[j + 1].total_reactions:
+                    sorted_list[j], sorted_list[j + 1] = sorted_list[j + 1], sorted_list[j]
+
+
+    elif sort_type == "desc" and type_1 == "list":
         for i in range(len(sorted_list) - 1):
             for j in range(len(sorted_list) - i - 1):
                 if sorted_list[j].total_reactions < sorted_list[j + 1].total_reactions:
