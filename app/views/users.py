@@ -6,7 +6,7 @@ import re
 import matplotlib.pyplot as plt
 import matplotlib
 
-matplotlib.use('agg')
+matplotlib.use("agg")
 
 
 @app.post("/users/create")
@@ -16,20 +16,24 @@ def user_create():
     first_name = data["first_name"]
     last_name = data["last_name"]
     email = data["email"]
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", email) or (email in [user.email for user in USERS]):
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email) or (
+        email in [user.email for user in USERS]
+    ):
         return Response("Ошибка при вводе почты", status=HTTPStatus.BAD_REQUEST)
 
     user = models.User(users_id, first_name, last_name, email)
     USERS.append(user)
     response = Response(
-        json.dumps({
-            "id": user.id,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "email": user.email,
-            "total_reactions": user.total_reactions,
-            "posts": user.posts,
-        }),
+        json.dumps(
+            {
+                "id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "total_reactions": user.total_reactions,
+                "posts": user.posts,
+            }
+        ),
         HTTPStatus.CREATED,
         mimetype="application/json",
     )
@@ -43,14 +47,16 @@ def get_users_info(user_id):
 
     user = USERS[user_id]
     response = Response(
-        json.dumps({
-            "id": user.id,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "email": user.email,
-            "total_reactions": user.total_reactions,
-            "posts": user.posts,
-        }),
+        json.dumps(
+            {
+                "id": user.id,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "total_reactions": user.total_reactions,
+                "posts": user.posts,
+            }
+        ),
         HTTPStatus.CREATED,
         mimetype="application/json",
     )
@@ -66,14 +72,17 @@ def get_sorted_users():
         for i in range(len(sorted_list) - 1):
             for j in range(len(sorted_list) - i - 1):
                 if sorted_list[j].total_reactions > sorted_list[j + 1].total_reactions:
-                    sorted_list[j], sorted_list[j + 1] = sorted_list[j + 1], sorted_list[j]
+                    sorted_list[j], sorted_list[j + 1] = (
+                        sorted_list[j + 1],
+                        sorted_list[j],
+                    )
 
-        fig, ax = plt.subplots()
-        user_names = [f'{user.first_name} {user.last_name}' for user in sorted_list]
-        user_reactions = [f'{user.total_reactions} {user.total_reactions}' for user in sorted_list]
-        ax.bar(user_names, user_reactions)
-        ax.set_ylabel("User reaction")
-        ax.set_title("User leaderboard by reactions")
+        user_names = [f"{user.first_name} {user.last_name}" for user in sorted_list]
+        user_reactions = [user.total_reactions for user in sorted_list]
+        plt.bar(user_names, user_reactions)
+        plt.xlabel("User names")
+        plt.ylabel("Amount of user's reaction")
+        plt.title("Leaderboard")
         plt.savefig("app/static/users_leaderboard.png")
 
         return Response(
@@ -88,14 +97,19 @@ def get_sorted_users():
         for i in range(len(sorted_list) - 1):
             for j in range(len(sorted_list) - i - 1):
                 if sorted_list[j].total_reactions > sorted_list[j + 1].total_reactions:
-                    sorted_list[j], sorted_list[j + 1] = sorted_list[j + 1], sorted_list[j]
-
+                    sorted_list[j], sorted_list[j + 1] = (
+                        sorted_list[j + 1],
+                        sorted_list[j],
+                    )
 
     elif sort_type == "desc" and type_1 == "list":
         for i in range(len(sorted_list) - 1):
             for j in range(len(sorted_list) - i - 1):
                 if sorted_list[j].total_reactions < sorted_list[j + 1].total_reactions:
-                    sorted_list[j], sorted_list[j + 1] = sorted_list[j + 1], sorted_list[j]
+                    sorted_list[j], sorted_list[j + 1] = (
+                        sorted_list[j + 1],
+                        sorted_list[j],
+                    )
     else:
         return Response(status=HTTPStatus.BAD_REQUEST)
 
@@ -112,8 +126,6 @@ def get_sorted_users():
     new_dict["users"] = temp_usrs_list
 
     response = Response(
-        json.dumps(new_dict),
-        HTTPStatus.CREATED,
-        mimetype="application/json"
+        json.dumps(new_dict), HTTPStatus.CREATED, mimetype="application/json"
     )
     return response
