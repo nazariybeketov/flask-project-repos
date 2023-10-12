@@ -81,7 +81,7 @@ def get_sorted_users():
         user_reactions = [user.total_reactions for user in sorted_list]
         plt.bar(user_names, user_reactions)
         plt.xlabel("User names")
-        plt.ylabel("Amount of user's reaction")
+        plt.ylabel("Amount of user's reactions")
         plt.title("Leaderboard")
         plt.savefig("app/static/users_leaderboard.png")
 
