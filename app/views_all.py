@@ -1,4 +1,4 @@
-from app import app, USERS
+from app import app
 
 
 @app.route("/")

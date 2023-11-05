@@ -1,0 +1,6 @@
+.DS_Store
+app/.DS_Store
+app/__pycache__/
+app/tests/.DS_Store
+app/tests/__pycache__/
+app/views/__pycache__/
