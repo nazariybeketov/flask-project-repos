@@ -35,7 +35,7 @@ def add_new_post():
 @app.get("/posts/<int:post_id>")
 def get_post_info(post_id):
     post = POSTS[post_id]
-    if not (isinstance(post_id, int)) or post_id < 0 or post_id >= len(POSTS):
+    if post_id < 0 or post_id >= len(POSTS):
         return Response(status=HTTPStatus.BAD_REQUEST)
 
     response = Response(
@@ -56,7 +56,7 @@ def get_post_info(post_id):
 @app.get("/users/<int:user_id>/posts")
 def get_sorted_posts_of_our_user(user_id):
     sort_type = request.get_json()["sort"]
-    if not (isinstance(user_id, int)) or user_id >= len(USERS) or user_id < 0:
+    if user_id >= len(USERS) or user_id < 0:
         return Response(status=HTTPStatus.BAD_REQUEST)
     all_posts = USERS[user_id].posts  # список id-шников постов нашего пользователя
     lst_pst_obj = []  # список постов (объектов)

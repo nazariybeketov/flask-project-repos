@@ -42,7 +42,7 @@ def user_create():
 
 @app.get("/users/<int:user_id>")
 def get_users_info(user_id):
-    if not (isinstance(user_id, int)) or user_id < 0 or user_id >= len(USERS):
+    if user_id < 0 or user_id >= len(USERS):
         return Response(status=HTTPStatus.NOT_FOUND)
 
     user = USERS[user_id]

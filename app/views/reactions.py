@@ -12,7 +12,7 @@ def add_reaction_on_the_post(post_id):
     post_owner_id = post.author_id
     post.reactions.append(reaction)
     USERS[post_owner_id].total_reactions += 1
-    if post_id < 0 or post_id >= len(POSTS) or not (isinstance(post_id, int)):
+    if post_id < 0 or post_id >= len(POSTS):
         return Response(status=HTTPStatus.BAD_REQUEST)
 
     return Response(status=HTTPStatus.CREATED)
